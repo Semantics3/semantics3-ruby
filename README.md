@@ -134,7 +134,7 @@ For this example, we are going to look at a particular product that is sold by s
 ```ruby
 # Build the query
 sem3.add( "offers", "sem3_id", "4znupRCkN6w2Q4Ke4s6sUC")
-sem3.add( "offers", "seller", ["ATRQ56T3H9TM5","LFleurs","Frys","Walmart"] )
+sem3.add( "offers", "seller", ["LFleurs","Frys","Walmart"] )
 sem3.add( "offers", "currency", "USD")
 sem3.add( "offers", "price", "gte", 30)
 sem3.add( "offers", "lastrecorded_at", "gte", 1348654600)
