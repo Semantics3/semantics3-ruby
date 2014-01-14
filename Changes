@@ -1,5 +1,8 @@
 Revision history for semantics3-ruby
 
+0.02    13-01-2014
+        Bumped json min. requirements.
+
 0.01    31-01-2013
         First version, released on an unsuspecting world.
 
