@@ -41,8 +41,11 @@ module Semantics3
     end
 
     class Products < Base
-        @@data_query = {}
-        @@query_result = {}
+        
+        def initialize
+            super
+            clear() 
+        end
 
         MAX_LIMIT = 10
 
@@ -77,17 +80,17 @@ module Semantics3
         end
         
         def all_products
-            if not @@query_result.has_key?(results)
+            if not @query_result.has_key?(results)
                 raise Error.new('Undefined Query','Query result is undefined. You need to run a query first.')
             end
-            @@query_result['results']  
+            @query_result['results']  
         end
 
         def iterate_products
             limit = MAX_LIMIT
-            prodRef = @@data_query['products']
+            prodRef = @data_query['products']
 
-            if (not ( @@query_result.has_key?('total_results_count') ) ) or ( @@query_result['offset'] >= @@query_result['total_results_count'] )
+            if (not ( @query_result.has_key?('total_results_count') ) ) or ( @query_result['offset'] >= @query_result['total_results_count'] )
                 return
             end 
 
@@ -113,11 +116,11 @@ module Semantics3
                 raise Error.new('Undefined Endpoint','Query Endpoint was not defined. You need to provide one. Eg: products','endpoint')
             end
 
-            if not @@data_query.has_key?(endpoint)
-                @@data_query[endpoint] = {}
+            if not @data_query.has_key?(endpoint)
+                @data_query[endpoint] = {}
             end
 
-            prodRef = @@data_query[endpoint]
+            prodRef = @data_query[endpoint]
 
             for i in 1..(fields.length - 1)
                 if not prodRef.has_key?(fields[i-1])
@@ -131,7 +134,7 @@ module Semantics3
             end
 
             #-- To be removed
-            #puts @@data_query.inspect
+            #puts @data_query.inspect
 
         end
 
@@ -146,7 +149,7 @@ module Semantics3
             prodRef = {}
             arrayCt = 0
 
-            if @@data_query.has_key?(endpoint)
+            if @data_query.has_key?(endpoint)
                 prodRef = data_query[endpoint]
                 arrayCt = fields.length-1
                 valid = 1
@@ -169,35 +172,35 @@ module Semantics3
             end
                 
             #-- To be removed
-            #puts @@data_query.inspect
+            #puts @data_query.inspect
 
         end
 
         def get_query(endpoint)
-            if not @@data_query.has_key?(endpoint)
+            if not @data_query.has_key?(endpoint)
                 raise Error.new('Undefined Endpoint','Query Endpoint was not defined. You need to provide one. Eg: products', 'endpoint')
             end
-            @@data_query[endpoint]
+            @data_query[endpoint]
         end
 
         def get_query_json(endpoint)
-            if not @@data_query.has_key?(endpoint)
+            if not @data_query.has_key?(endpoint)
                 raise Error.new('Undefined Endpoint','Query Endpoint was not defined. You need to provide one. Eg: products', 'endpoint')
             end
-            @@data_query[endpoint].to_json
+            @data_query[endpoint].to_json
         end
 
         def get_results
-            @@query_result
+            @query_result
         end
         
         def get_results_json
-            @@query_result.to_json
+            @query_result.to_json
         end
 
         def clear
-            @@data_query={}
-            @@query_result={}
+            @data_query={}
+            @query_result={}
         end
 
         def run_query(endpoint,*params)
@@ -210,7 +213,7 @@ module Semantics3
             data = params[0]
 
             if data == nil
-                @@query_result = _make_request(endpoint,@@data_query[endpoint].to_json)
+                @query_result = _make_request(endpoint,@data_query[endpoint].to_json)
             else
                 if not data.is_a?(Hash) and not data.is_a?(String)
                     #-- Throw error - neither string nor hash
@@ -218,19 +221,19 @@ module Semantics3
                 else
                     #-- Data is Hash ref. Great just send it.
                     if data.is_a?(Hash)
-                        @@query_result = _make_request(endpoint,data.to_json)
+                        @query_result = _make_request(endpoint,data.to_json)
                     #-- Data is string
                     elsif data.is_a?(String)
                         #-- Check if it's valid JSON
                         if JSON.is_json?(data)
-                            @@query_result = _make_request(endpoint,data)
+                            @query_result = _make_request(endpoint,data)
                         else
                             raise Error.new('Invalid Input','You submitted an invalid JSON query string')
                         end
                     end
                 end
             end
-            @@query_result
+            @query_result
         end
 
     end
