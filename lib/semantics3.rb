@@ -41,8 +41,8 @@ module Semantics3
     end
 
     class Products < Base
-        
-        def initialize
+
+        def initialize api_key, api_secret
             super
             clear() 
         end
