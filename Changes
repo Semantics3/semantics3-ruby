@@ -1,5 +1,8 @@
 Revision history for semantics3-ruby
 
+0.03    07-02-2014
+        Made library thread safe [Thanks to Mark Evans/ShopGenius App (mark@shopgeniusapp.com)]
+
 0.02    13-01-2014
         Bumped json min. requirements.
 

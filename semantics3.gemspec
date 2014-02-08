@@ -2,9 +2,9 @@ $:.unshift(File.join(File.dirname(__FILE__), 'lib'))
 
 spec = Gem::Specification.new do |s|
   s.name = 'semantics3'
-  s.version = '0.02'
+  s.version = '0.03'
   s.summary = 'Ruby bindings for the Semantics3 API'
-  s.description = 'Get access to a constantly updated database of product and price ifnormations. See https://semantics3.com/ for more information.'
+  s.description = 'Get access to a constantly updated database of product and price data. See https://semantics3.com/ for more information.'
   s.authors = ['Sivamani Varun']
   s.email = ['varun@semantics3.com']
   s.homepage = 'https://semantics3.com'
