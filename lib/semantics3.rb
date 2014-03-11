@@ -8,6 +8,7 @@
 require 'rubygems'
 require 'oauth'
 require 'uri'
+require 'cgi'
 require 'json'
 
 module Semantics3
@@ -29,7 +30,7 @@ module Semantics3
 
         #returns a value
         def _make_request(endpoint, params)
-            url = 'https://api.semantics3.com/v1/' + endpoint + '?q=' + URI.escape(params)
+            url = 'https://api.semantics3.com/v1/' + endpoint + '?q=' + CGI.escape(params)
 
             #puts "url = #{url}"
             response = @auth.get(url)
