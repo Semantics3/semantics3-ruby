@@ -82,7 +82,9 @@ puts productsHash.to_json
 page = 0 
 while (productsHash = sem3.iterate_products) do
     page = page + 1 
-    puts "Iterating through page: #{page}"
+    puts "We are at page = #{page}"
+    puts "The results for this page are:\n"
+    puts productsHash.to_json
 end
 ```
 
