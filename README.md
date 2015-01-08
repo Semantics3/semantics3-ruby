@@ -45,37 +45,37 @@ API_SECRET = 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
 sem3 = Semantics3::Products.new(API_KEY,API_SECRET)
 ```
 
-### First Query aka 'Hello World':
+### First Request aka 'Hello World':
 
-Let's make our first query! We are going to run a simple search fo the word "iPhone" as follows:
+Let's run our first request! We are going to run a simple search fo the word "iPhone" as follows:
 
 ```ruby
-# Build the query
+# Build the request
 sem3.products_field( "search", "iphone" )
 
-# Make the query
+# Run the request
 productsHash = sem3.get_products()
 
-# View the results of the query
+# View the results of the request
 puts productsHash.to_json
 ```
 
-## Sample Queries
+## Sample Requests
 
-The following queries show you how to interface with some of the core functionality of the Semantics3 Products API:
+The following requests show you how to interface with some of the core functionality of the Semantics3 Products API:
 
 ### Pagination
 
-The example in our "Hello World" script returns the first 10 results. In this example, we'll scroll to subsequent pages, beyond our initial query:
+The example in our "Hello World" script returns the first 10 results. In this example, we'll scroll to subsequent pages, beyond our initial request:
 
 ```ruby
-# Build the query
+# Build the request
 sem3.products_field( "search", "iphone" )
 
-# Make the query
+# Run the request
 productsHash = sem3.get_products()
 
-# View the results of the query
+# View the results of the request
 puts productsHash.to_json
 
 # Goto the next 'page'
@@ -93,14 +93,14 @@ end
 Running a UPC/EAN/GTIN query is as simple as running a search query:
 
 ```ruby
-# Build the query
+# Build the request
 sem3.products_field( "upc", "883974958450" )
 sem3.products_field( "field", ["name","gtins"] )
 
-# Make the query
+# Run the request
 productsHash = sem3.get_products()
 
-# View the results of the query
+# View the results of the request
 puts productsHash.to_json
 ```
 
@@ -130,13 +130,13 @@ puts productsHash.to_json
 To lookup details about a cat_id, run your request against the categories resource:
 
 ```ruby
-# Build the query
+# Build the request
 sem3.products_field( "cat_id", 4992 )
 
-# Make the query
+# Run the request
 productsHash = sem3.get_products()
 
-# View the results of the query
+# View the results of the request
 puts productsHash.to_json
 ```
 
