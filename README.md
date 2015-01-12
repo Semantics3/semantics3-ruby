@@ -3,7 +3,6 @@
 semantics3-ruby is a Ruby client for accessing the Semantics3 Products API, which provides structured information, including pricing histories, for a large number of products.
 See https://www.semantics3.com for more information.
 
-Quickstart guide: https://www.semantics3.com/quickstart
 API documentation can be found at https://www.semantics3.com/docs/
 
 ## Installation
@@ -46,106 +45,99 @@ API_SECRET = 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
 sem3 = Semantics3::Products.new(API_KEY,API_SECRET)
 ```
 
-### First Query aka 'Hello World':
+### First Request aka 'Hello World':
 
-Let's make our first query! For this query, we are going to search for all Toshiba products that fall under the category of "Computers and Accessories", whose cat_id is 4992. 
+Let's run our first request! We are going to run a simple search fo the word "iPhone" as follows:
 
 ```ruby
-# Build the query
-sem3.products_field( "cat_id", 4992 )
-sem3.products_field( "brand", "Toshiba" )
+# Build the request
+sem3.products_field( "search", "iphone" )
 
-# Make the query
+# Run the request
 productsHash = sem3.get_products()
 
-# View the results of the query
+# View the results of the request
 puts productsHash.to_json
 ```
 
-## Examples
+## Sample Requests
 
-The following examples show you how to interface with some of the core functionality of the Semantics3 Products API. For more detailed examples check out the Quickstart guide: https://www.semantics3.com/quickstart
-
-### Explore the Category Tree
-
-In this example we are going to be accessing the categories endpoint. We are going to be specifically exploring the "Computers and Accessories" category, which has a cat_id of 4992. For more details regarding our category tree and associated cat_ids check out our API docs at https://www.semantics3.com/docs
-
-```ruby
-# Build the query
-sem3.categories_field( "cat_id", 4992 )
-
-# Make the query
-categoriesHash = sem3.get_categories()
-
-# View the results of the query
-puts categoriesHash.to_json
-```
-
-### Nested Search Query
-
-You can construct complex queries by just repeatedly calling the products_field() or add() methods. Here is how we translate the following JSON query - '{"cat_id":4992,"brand":"Toshiba","weight":{"gte":1000000,"lt":1500000},"sitedetails":{"name":"newegg.com","latestoffers":{"currency":"USD","price":{"gte":100}}}}'.
-
-This query returns all Toshiba products within a certain weight range narrowed down to just those that retailed recently on newegg.com for >= USD 100.
-
-```ruby
-# Build the query
-sem3.products_field( "cat_id", 4992 )
-sem3.products_field( "brand", "Toshiba" )
-sem3.products_field( "weight", "gte", 1000000 )
-sem3.products_field( "weight", "lt", 1500000 )
-sem3.products_field( "sitedetails", "name", "newegg.com" )
-sem3.products_field( "sitedetails", "latestoffers", "currency", "USD" )
-sem3.products_field( "sitedetails", "latestoffers", "price", "gte", 100 )
-
-# Let's make a modification - say we no longer want the weight attribute
-sem3.remove( "products", "brand", "weight" )
-
-# Let's view the JSON query we just constructed. This is a good starting point to debug, if you are getting incorrect 
-# results for your query
-constructedJson = sem3.get_query_json( "products" )
-puts constructedJson
-
-# Make the query
-productsHash = sem3.get_products
-
-# View the results of the query
-puts productsHash.to_json
-```
+The following requests show you how to interface with some of the core functionality of the Semantics3 Products API:
 
 ### Pagination
 
-Let's now look at doing pagination, continuing from where we stopped previously.
+The example in our "Hello World" script returns the first 10 results. In this example, we'll scroll to subsequent pages, beyond our initial request:
 
 ```ruby
+# Build the request
+sem3.products_field( "search", "iphone" )
+
+# Run the request
+productsHash = sem3.get_products()
+
+# View the results of the request
+puts productsHash.to_json
+
 # Goto the next 'page'
 page = 0 
 while (productsHash = sem3.iterate_products) do
     page = page + 1 
-    puts "Iterating through page: #{page}"
+    puts "We are at page = #{page}"
+    puts "The results for this page are:\n"
+    puts productsHash.to_json
 end
 ```
 
-### Explore Price Histories
+### UPC Query
 
-We shall use the add() method, which allows you to access any of the supported endpoints by just specifiying the name of the endpoint. add( "products", param1, param2, ...) is the equivalent of products_field( param1, param2, ... ), add( "offers", param1, param2, ... ) is the equivalent of offers_field( param1, param2, ...)
-
-For this example, we are going to look at a particular product that is sold by select mercgants and whose price is >= USD 30 and seen after a specific date (specified as a UNIX timestamp).
+Running a UPC/EAN/GTIN query is as simple as running a search query:
 
 ```ruby
-# Build the query
-sem3.add( "offers", "sem3_id", "4znupRCkN6w2Q4Ke4s6sUC")
-sem3.add( "offers", "seller", ["LFleurs","Frys","Walmart"] )
-sem3.add( "offers", "currency", "USD")
-sem3.add( "offers", "price", "gte", 30)
-sem3.add( "offers", "lastrecorded_at", "gte", 1348654600)
+# Build the request
+sem3.products_field( "upc", "883974958450" )
+sem3.products_field( "field", ["name","gtins"] )
 
-# Make the query
-offersHash = sem3.get_offers
-#Alternatively we could also do
-offersHash = sem3.run_query( "offers" )
+# Run the request
+productsHash = sem3.get_products()
 
-# View the results of the query
-puts offersHash.to_json
+# View the results of the request
+puts productsHash.to_json
+```
+
+### URL Query
+
+Get the picture? You can run URL queries as follows:
+
+```ruby
+sem3.products_field( "url", "http://www.walmart.com/ip/15833173" )
+productsHash = sem3.get_products()
+puts productsHash.to_json
+```
+
+### Price Filter
+
+Filter by price using the "lt" (less than) tag:
+
+```ruby
+sem3.products_field( "search", "iphone" )
+sem3.products_field( "price", "lt", 300 )
+productsHash = sem3.get_products()
+puts productsHash.to_json
+```
+
+### Category ID Query
+
+To lookup details about a cat_id, run your request against the categories resource:
+
+```ruby
+# Build the request
+sem3.products_field( "cat_id", 4992 )
+
+# Run the request
+productsHash = sem3.get_products()
+
+# View the results of the request
+puts productsHash.to_json
 ```
 
 ## Contributing
@@ -154,11 +146,11 @@ Use GitHub's standard fork/commit/pull-request cycle.  If you have any questions
 
 ## Author
 
-* Sivamani VARUN <varun@semantics3.com>
+* Mounarajan <mounarajan@semantics3.com>
 
 ## Copyright
 
-Copyright (c) 2013 Semantics3 Inc.
+Copyright (c) 2015 Semantics3 Inc.
 
 ## License
 
@@ -181,5 +173,3 @@ Copyright (c) 2013 Semantics3 Inc.
     LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
     FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
     DEALINGS IN THE SOFTWARE.
-
-
