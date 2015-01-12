@@ -144,8 +144,9 @@ puts productsHash.to_json
 
 Use GitHub's standard fork/commit/pull-request cycle.  If you have any questions, email <support@semantics3.com>.
 
-## Author
+## Authors
 
+* Sivamani VARUN <varun@semantics3.com>
 * Mounarajan <mounarajan@semantics3.com>
 
 ## Copyright
