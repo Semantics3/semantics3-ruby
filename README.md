@@ -146,7 +146,7 @@ Use GitHub's standard fork/commit/pull-request cycle.  If you have any questions
 
 ## Author
 
-* Sivamani VARUN <varun@semantics3.com>
+* Mounarajan <mounarajan@semantics3.com>
 
 ## Copyright
 
