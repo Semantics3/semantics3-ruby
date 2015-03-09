@@ -29,14 +29,29 @@ module Semantics3
         private
 
         #returns a value
-        def _make_request(endpoint, params)
-            url = 'https://api.semantics3.com/v1/' + endpoint + '?q=' + CGI.escape(params)
+        def _make_request(endpoint,method, params)
+            base_url = 'https://api.semantics3.com/v1/' #+ endpoint + '?q=' + CGI.escape(params)
+
+            if method == "GET"
+                request_data = CGI.escape(params)
+                encoded_url = base_url + endpoint + '?q=' + request_data
+                response = @auth.get(encoded_url)
+                JSON.parse response.body
+            elsif method == "DELETE"
+                url = base_url + endpoint
+                response = @auth.delete(url)
+                JSON.parse response.body
+            #else
+               # url = base_url + endpoint
+               # response = @auth."method"(url)
+               # JSON.parse response.body
+            end
 
             #puts "url = #{url}"
-            response = @auth.get(url)
+            #
 
             #-- Response.code - TBD
-            JSON.parse response.body
+            #JSON.parse response.body
         end
 
     end
@@ -204,7 +219,7 @@ module Semantics3
             @query_result={}
         end
 
-        def run_query(endpoint,*params)
+        def run_query(endpoint,method = "GET",*params)
 
             #-- If not defined endpoint, throw error
             if not ( endpoint.kind_of? String and endpoint != '')
@@ -214,7 +229,7 @@ module Semantics3
             data = params[0]
 
             if data == nil
-                @query_result = _make_request(endpoint,@data_query[endpoint].to_json)
+                @query_result = _make_request(endpoint,method,@data_query[endpoint].to_json)
             else
                 if not data.is_a?(Hash) and not data.is_a?(String)
                     #-- Throw error - neither string nor hash
@@ -222,12 +237,12 @@ module Semantics3
                 else
                     #-- Data is Hash ref. Great just send it.
                     if data.is_a?(Hash)
-                        @query_result = _make_request(endpoint,data.to_json)
+                        @query_result = _make_request(endpoint,method,data.to_json)
                     #-- Data is string
                     elsif data.is_a?(String)
                         #-- Check if it's valid JSON
                         if JSON.is_json?(data)
-                            @query_result = _make_request(endpoint,data)
+                            @query_result = _make_request(endpoint,method,data)
                         else
                             raise Error.new('Invalid Input','You submitted an invalid JSON query string')
                         end
@@ -262,5 +277,6 @@ module JSON
         end 
     end
 end
+
 
 
