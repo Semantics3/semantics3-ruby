@@ -10,10 +10,6 @@ require 'oauth'
 require 'uri'
 require 'cgi'
 require 'json'
-require 'net/http'
-require 'rest_client'
-require 'faraday'
-require 'oauth/request_proxy/typhoeus_request'
 
 module Semantics3
     @auth={}
@@ -26,8 +22,8 @@ module Semantics3
             raise Error.new('API Credentials Missing','You did not supply an api_key. Please sign up at https://semantics3.com/ to obtain your api_key.','api_key') if api_key == ''
             raise Error.new('API Credentials Missing','You did not supply an api_secret. Please sign up at https://semantics3.com/ to obtain your api_secret.','api_secret') if api_secret == ''
 
-            consumer = OAuth::Consumer.new(@api_key, @api_secret)
-            @auth = OAuth::AccessToken.new(consumer)
+            @consumer = OAuth::Consumer.new(@api_key, @api_secret)
+            @auth = OAuth::AccessToken.new(@consumer)
         end
 
         private
@@ -35,7 +31,7 @@ module Semantics3
         #def oauth(response)
         #returns a value
         def _make_request(endpoint,method = "GET",params)
-            base_url = 'https://api.semantics3.com/v1/' #+ endpoint + '?q=' + CGI.escape(params)
+            base_url = 'https://api-staging.semantics3.com/v1/' #+ endpoint + '?q=' + CGI.escape(params)
 
             if method == "GET"
                 request_data = CGI.escape(params)
@@ -47,20 +43,17 @@ module Semantics3
                 response = @auth.delete(url)
                 JSON.parse response.body
             else    
-                uri = base_url+endpoint
-                oauth_params = {:consumer => consumer, :token => @auth,:request_uri => uri}
-                hydra = Typhoeus::Hydra.new
-                req = Typhoeus::Request.new(uri,:method => :post)
-
-                oauth_helper = OAuth::Client::Helper.new(req, oauth_params)
-                req.options[:headers].merge!({"Authorization" => oauth_helper.header}) # Signs the request
-                hydra.queue(req)
-                hydra.run
-                @response = req.response
+                url = URI(base_url+endpoint)
+                request = Net::HTTP::Post.new url.request_uri,params
+                http             = Net::HTTP.new url.host, url.port
+                http.use_ssl     = true
+                http.verify_mode = OpenSSL::SSL::VERIFY_PEER
+                request.oauth! http, @consumer,@auth
+                http.start
+                response = http.request request
+                puts "The response status was #{response.code}\n"
                 
-                puts "The response status was #{@response.code}\n"
-                
-                puts "The response status was #{@response.body}"
+                puts "The response status was #{response.body}"
                   JSON.parse response.body
             end
         end
@@ -248,7 +241,7 @@ module Semantics3
                 else
                     #-- Data is Hash ref. Great just send it.
                     if data.is_a?(Hash)
-                        @query_result = _make_request(endpoint,method,data)
+                        @query_result = _make_request(endpoint,method,data.to_json)
                     #-- Data is string
                     elsif data.is_a?(String)
                         #-- Check if it's valid JSON
@@ -288,30 +281,3 @@ module JSON
         end 
     end
 end
-
-
-API_KEY = 'SEM3F9D850FC03D7FD2E5CE68994B98243C9'
-API_SECRET = 'OGU4N2M3OTlkN2EyYTAxYmQxNmQ1ZmI2ZDRlZmI4NGY'
-sem3 = Semantics3::Products.new(API_KEY,API_SECRET)
- #http://148.251.44.168:5000
- #registrationData = '{"webhook_uri":"http://148.251.44.168:5000"}'
- registrationData = {
-    "webhook_uri" => "http://mydomain.com/webhooks-callback-url"
-}
-
- puts sem3.run_query("webhooks","POST",registrationData);
-#sem3.products_field( "search", "Samsung Galaxy" )
-
-#productsHash = sem3.get_products
-#puts "Results of query:\n",productsHash.to_json
-#https://gist.github.com/ichiban/1075327
-#http://www.rubyinside.com/nethttp-cheat-sheet-2940.html
-#https://github.com/rest-client/rest-client
-#http://apidock.com/ruby/Net/HTTP
-#http://stackoverflow.com/questions/24886973/post-raw-string-with-ruby-instead-of-form-data-with-ruby
-#http://www.blog.openshell.in/2011/03/nethttp-raw-post-ruby-code/
-#http://devcenter.kinvey.com/html5/tutorials/how-to-implement-safe-signin-via-oauth#
-#http://requests-oauthlib.readthedocs.org/en/latest/oauth1_workflow.html
-#https://github.com/pelle/oauth/blob/master/test/test_net_http_client.rb
-
-
