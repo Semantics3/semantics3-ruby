@@ -40,7 +40,7 @@ module Semantics3
                 JSON.parse response.body
             elsif method == "DELETE"
                 url = base_url + endpoint
-                response = @auth.delete(url)
+                response = @auth.delete(url,params)
                 JSON.parse response.body
             else    
                 url = URI(base_url+endpoint)
@@ -241,7 +241,7 @@ module Semantics3
                 else
                     #-- Data is Hash ref. Great just send it.
                     if data.is_a?(Hash)
-                        @query_result = _make_request(endpoint,method,data.to_json)
+                        @query_result = _make_request(endpoint,method,data)
                     #-- Data is string
                     elsif data.is_a?(String)
                         #-- Check if it's valid JSON
