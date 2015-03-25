@@ -233,7 +233,7 @@ module Semantics3
             data = params[0]
 
             if data == nil
-                @query_result = _make_request(endpoint,method,@data_query[endpoint].to_json,)
+                @query_result = _make_request(endpoint,method,@data_query[endpoint].to_json)
             else
                 if not data.is_a?(Hash) and not data.is_a?(String)
                     #-- Throw error - neither string nor hash
@@ -280,4 +280,3 @@ module JSON
             false
         end 
     end
-end
