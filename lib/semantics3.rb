@@ -51,9 +51,6 @@ module Semantics3
                 request.oauth! http, @consumer,@auth
                 http.start
                 response = http.request request
-                puts "The response status was #{response.code}\n"
-                
-                puts "The response status was #{response.body}"
                   JSON.parse response.body
             end
         end
@@ -280,3 +277,4 @@ module JSON
             false
         end 
     end
+end
