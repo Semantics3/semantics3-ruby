@@ -1,5 +1,8 @@
 Revision history for semantics3-ruby
 
+0.10    31-03-2015
+        Implemented support for webhooks [Non-GET requests]
+
 0.04    11-03-2014
         Use CGI.escape instead of URI.escape [Thanks to Mark Evans/ShopGenius App (mark@shopgeniusapp.com)]
 
