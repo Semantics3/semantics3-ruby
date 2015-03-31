@@ -22,21 +22,37 @@ module Semantics3
             raise Error.new('API Credentials Missing','You did not supply an api_key. Please sign up at https://semantics3.com/ to obtain your api_key.','api_key') if api_key == ''
             raise Error.new('API Credentials Missing','You did not supply an api_secret. Please sign up at https://semantics3.com/ to obtain your api_secret.','api_secret') if api_secret == ''
 
-            consumer = OAuth::Consumer.new(@api_key, @api_secret)
-            @auth = OAuth::AccessToken.new(consumer)
+            @consumer = OAuth::Consumer.new(@api_key, @api_secret)
+            @auth = OAuth::AccessToken.new(@consumer)
         end
 
         private
-
+        
+        #def oauth(response)
         #returns a value
-        def _make_request(endpoint, params)
-            url = 'https://api.semantics3.com/v1/' + endpoint + '?q=' + CGI.escape(params)
+        def _make_request(endpoint,method = "GET",params)
+            base_url = 'https://api-staging.semantics3.com/v1/' #+ endpoint + '?q=' + CGI.escape(params)
 
-            #puts "url = #{url}"
-            response = @auth.get(url)
-
-            #-- Response.code - TBD
-            JSON.parse response.body
+            if method == "GET"
+                request_data = CGI.escape(params)
+                encoded_url = base_url + endpoint + '?q=' + request_data
+                response = @auth.get(encoded_url)
+                JSON.parse response.body
+            elsif method == "DELETE"
+                url = base_url + endpoint
+                response = @auth.delete(url,params)
+                JSON.parse response.body
+            else    
+                url = URI(base_url+endpoint)
+                request = Net::HTTP::Post.new url.request_uri,params
+                http             = Net::HTTP.new url.host, url.port
+                http.use_ssl     = true
+                http.verify_mode = OpenSSL::SSL::VERIFY_PEER
+                request.oauth! http, @consumer,@auth
+                http.start
+                response = http.request request
+                  JSON.parse response.body
+            end
         end
 
     end
@@ -204,7 +220,7 @@ module Semantics3
             @query_result={}
         end
 
-        def run_query(endpoint,*params)
+        def run_query(endpoint,method = "GET",*params)
 
             #-- If not defined endpoint, throw error
             if not ( endpoint.kind_of? String and endpoint != '')
@@ -214,7 +230,7 @@ module Semantics3
             data = params[0]
 
             if data == nil
-                @query_result = _make_request(endpoint,@data_query[endpoint].to_json)
+                @query_result = _make_request(endpoint,method,@data_query[endpoint].to_json)
             else
                 if not data.is_a?(Hash) and not data.is_a?(String)
                     #-- Throw error - neither string nor hash
@@ -222,12 +238,12 @@ module Semantics3
                 else
                     #-- Data is Hash ref. Great just send it.
                     if data.is_a?(Hash)
-                        @query_result = _make_request(endpoint,data.to_json)
+                        @query_result = _make_request(endpoint,method,data)
                     #-- Data is string
                     elsif data.is_a?(String)
                         #-- Check if it's valid JSON
                         if JSON.is_json?(data)
-                            @query_result = _make_request(endpoint,data)
+                            @query_result = _make_request(endpoint,method,data)
                         else
                             raise Error.new('Invalid Input','You submitted an invalid JSON query string')
                         end
@@ -262,5 +278,3 @@ module JSON
         end 
     end
 end
-
-
