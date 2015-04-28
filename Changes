@@ -1,5 +1,8 @@
 Revision history for semantics3-ruby
 
+0.11    28-04-2015
+        Incorrect base url. [Critical Bug Fix]
+
 0.10    31-03-2015
         Implemented support for webhooks [Non-GET requests]
 
