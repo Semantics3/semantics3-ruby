@@ -31,7 +31,8 @@ module Semantics3
         #def oauth(response)
         #returns a value
         def _make_request(endpoint,method = "GET",params)
-            base_url = 'https://api-staging.semantics3.com/v1/' #+ endpoint + '?q=' + CGI.escape(params)
+
+            base_url = 'https://api.semantics3.com/v1/' #+ endpoint + '?q=' + CGI.escape(params)
 
             if method == "GET"
                 request_data = CGI.escape(params)
