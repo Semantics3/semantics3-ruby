@@ -98,7 +98,7 @@ module Semantics3
         end
         
         def all_products
-            if not @query_result.has_key?(results)
+            if not @query_result.has_key?('results')
                 raise Error.new('Undefined Query','Query result is undefined. You need to run a query first.')
             end
             @query_result['results']  
