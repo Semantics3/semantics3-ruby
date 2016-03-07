@@ -43,16 +43,12 @@ module Semantics3
                 url = base_url + endpoint
                 response = @auth.delete(url,params)
                 JSON.parse response.body
-            else    
-                url = URI(base_url+endpoint)
-                request = Net::HTTP::Post.new url.request_uri,params
-                http             = Net::HTTP.new url.host, url.port
-                http.use_ssl     = true
-                http.verify_mode = OpenSSL::SSL::VERIFY_PEER
-                request.oauth! http, @consumer,@auth
-                http.start
-                response = http.request request
-                  JSON.parse response.body
+            elsif method == "POST"
+                url = base_url + endpoint
+                response = @auth.post(url,params.to_json,{'Content-Type' => 'application/json'})
+                JSON.parse response.body
+            else
+                raise Error.new('Invalid Method','You have entered an invalid method. Use GET,DELETE or POST.','method')
             end
         end
 
