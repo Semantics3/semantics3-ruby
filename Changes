@@ -1,5 +1,11 @@
 Revision history for semantics3-ruby
 
+0.14    13-07-2016
+        Added ability to use basic auth instead of oauth [Feature]
+
+0.13    07-03-2016
+        Fixed issues with making POST requests [Bug Fix]
+
 0.12    30-05-2015
         Modifying static to a string variable [Bug Fix]
 

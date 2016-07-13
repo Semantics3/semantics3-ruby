@@ -7,6 +7,7 @@
 
 require 'rubygems'
 require 'oauth'
+require 'curb'
 require 'uri'
 require 'cgi'
 require 'json'
@@ -15,9 +16,10 @@ module Semantics3
     @auth={}
 
     class Base
-        def initialize(api_key,api_secret)
+        def initialize(api_key,api_secret,auth = "oauth")
             @api_key = api_key
             @api_secret = api_secret
+            @auth_method = auth
 
             raise Error.new('API Credentials Missing','You did not supply an api_key. Please sign up at https://semantics3.com/ to obtain your api_key.','api_key') if api_key == ''
             raise Error.new('API Credentials Missing','You did not supply an api_secret. Please sign up at https://semantics3.com/ to obtain your api_secret.','api_secret') if api_secret == ''
@@ -33,22 +35,44 @@ module Semantics3
         def _make_request(endpoint,method = "GET",params)
 
             base_url = 'https://api.semantics3.com/v1/' #+ endpoint + '?q=' + CGI.escape(params)
+            if @auth_method == "basic"
+                base_url = 'https://api.semantics3.com/test/v1/' #+ endpoint + '?q=' + CGI.escape(params)
 
-            if method == "GET"
-                request_data = CGI.escape(params)
-                encoded_url = base_url + endpoint + '?q=' + request_data
-                response = @auth.get(encoded_url)
-                JSON.parse response.body
-            elsif method == "DELETE"
-                url = base_url + endpoint
-                response = @auth.delete(url,params)
-                JSON.parse response.body
-            elsif method == "POST"
-                url = base_url + endpoint
-                response = @auth.post(url,params.to_json,{'Content-Type' => 'application/json'})
-                JSON.parse response.body
+                if method == "GET"
+                    request_data = CGI.escape(params)
+                    encoded_url = base_url + endpoint + '?q=' + request_data
+                    http = Curl.get(encoded_url) do|http|
+                        http.headers['api_key'] = @api_key
+                    end
+                    JSON.parse http.body_str
+                elsif method == "DELETE"
+                    url = base_url + endpoint
+                    response = @auth.delete(url,params)
+                    JSON.parse response.body
+                elsif method == "POST"
+                    url = base_url + endpoint
+                    response = @auth.post(url,params.to_json,{'Content-Type' => 'application/json'})
+                    JSON.parse response.body
+                else
+                    raise Error.new('Invalid Method','You have entered an invalid method. Use GET,DELETE or POST.','method')
+                end    
             else
-                raise Error.new('Invalid Method','You have entered an invalid method. Use GET,DELETE or POST.','method')
+                if method == "GET"
+                    request_data = CGI.escape(params)
+                    encoded_url = base_url + endpoint + '?q=' + request_data
+                    response = @auth.get(encoded_url)
+                    JSON.parse response.body
+                elsif method == "DELETE"
+                    url = base_url + endpoint
+                    response = @auth.delete(url,params)
+                    JSON.parse response.body
+                elsif method == "POST"
+                    url = base_url + endpoint
+                    response = @auth.post(url,params.to_json,{'Content-Type' => 'application/json'})
+                    JSON.parse response.body
+                else
+                    raise Error.new('Invalid Method','You have entered an invalid method. Use GET,DELETE or POST.','method')
+                end
             end
         end
 
@@ -56,7 +80,7 @@ module Semantics3
 
     class Products < Base
 
-        def initialize api_key, api_secret
+        def initialize api_key, api_secret, auth = 'oauth'
             super
             clear() 
         end
