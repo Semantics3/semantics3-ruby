@@ -95,7 +95,7 @@ Running a UPC/EAN/GTIN query is as simple as running a search query:
 ```ruby
 # Build the request
 sem3.products_field( "upc", "883974958450" )
-sem3.products_field( "field", ["name","gtins"] )
+sem3.products_field( "fields”, ["name","gtins"] )
 
 # Run the request
 productsHash = sem3.get_products()
