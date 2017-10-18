@@ -1,9 +1,25 @@
 # semantics3-ruby
 
 semantics3-ruby is a Ruby client for accessing the Semantics3 Products API, which provides structured information, including pricing histories, for a large number of products.
-See https://www.semantics3.com for more information.
 
-API documentation can be found at https://www.semantics3.com/docs/
+API documentation can be found at https://docs.semantics3.com/reference.
+
+Visit https://www.semantics3.com for more information.
+
+- [Installation](#installation)
+- [Requirements](#requirements)
+- [Getting Started](#getting-started)
+  - [Setup Work](#setup-work)
+  - [First Request](#first-request-aka-hello-world)
+- [Sample Requests](#sample-requests)
+  - [Pagination](#pagination)
+  - [UPC Query](#upc-query)
+  - [Price Filter](#price-filter)
+  - [Category ID Query](#category-id-query)
+- [Webhooks](#webhooks)
+  - [Creating a webhook](#creating-a-webhook)
+  - [Registering events](#registering-events)
+  - [Webhook notifications](#webhook-notifications)
 
 ## Installation
 
@@ -21,14 +37,11 @@ To build and install from the latest source:
 
 ## Requirements
 
-* json
-* oauth
+See [`semantics3.gemspec`](semantics3.gemspec)
 
 ## Getting Started
 
-In order to use the client, you must have both an API key and an API secret. To obtain your key and secret, you need to first create an account at
-https://www.semantics3.com/
-You can access your API access credentials from the user dashboard at https://dashboard.semantics3.com.
+In order to use the client, you must have both an API key and an API secret. To obtain your key and secret, you need to first create a [Semantics3](https://www.semantics3.com) account. You can access your API access credentials from the user dashboard at https://dashboard.semantics3.com.
 
 ### Setup Work
 
@@ -47,7 +60,7 @@ sem3 = Semantics3::Products.new(API_KEY,API_SECRET)
 
 ### First Request aka 'Hello World':
 
-Let's run our first request! We are going to run a simple search fo the word "iPhone" as follows:
+Let's run our first request! We are going to run a simple search for the word "iphone" as follows:
 
 ```ruby
 # Build the request
@@ -95,7 +108,7 @@ Running a UPC/EAN/GTIN query is as simple as running a search query:
 ```ruby
 # Build the request
 sem3.products_field( "upc", "883974958450" )
-sem3.products_field( "fields”, ["name","gtins"] )
+sem3.products_field( "fields", ["name","gtins"] )
 
 # Run the request
 productsHash = sem3.get_products()
@@ -127,7 +140,9 @@ puts productsHash.to_json
 
 ### Category ID Query
 
-To lookup details about a cat_id, run your request against the categories resource:
+To lookup details about a cat_id, run your request against the categories resource.
+
+Acceptable values for cat_id can be found on the category tree described [here](https://docs.semantics3.com/reference#about-categories).
 
 ```ruby
 # Build the request
@@ -141,12 +156,13 @@ puts productsHash.to_json
 ```
 
 ## Webhooks
-You can use webhooks to get near-real-time price updates from Semantics3. 
+
+You can use webhooks to get near-real-time price updates from Semantics3.
 
 ### Creating a webhook
 
 You can register a webhook with Semantics3 by sending a POST request to `"webhooks"` endpoint.
-To verify that your URL is active, a GET request will be sent to your server with a `verification_code` parameter. Your server should respond with `verification_code` in the response body to complete the verification process.
+To verify that your URL is active, a GET request will be sent to the registered address with a `verification_code` parameter. Your application must read the `verification_code` query parameter and respond to this request with its value in the response body to complete the verification process.
 
 ```ruby
 params = {
@@ -156,6 +172,7 @@ params = {
  res = sem3.run_query("webhooks","POST",params)
  puts res
 ```
+
 To fetch existing webhooks
 ```ruby
 res = sem3.run_query("webhooks","GET")
@@ -172,7 +189,8 @@ puts res
 ```
 
 ### Registering events
-Once you register a webhook, you can start adding events to it. Semantics3 server will send you notifications when these events occur.
+
+Once you create a webhook, you can start adding events to it. Semantics3 will send you notifications when these events occur.
 To register events for a specific webhook send a POST request to the `"webhooks/{webhook_id}/events"` endpoint
 
 ```ruby
@@ -206,6 +224,7 @@ puts res
 ```
 
 ### Webhook Notifications
+
 Once you have created a webhook and registered events on it, notifications will be sent to your registered webhook URI via a POST request when the corresponding events occur. Make sure that your server can accept POST requests. Here is how a sample notification object looks like
 ```javascript
 {
@@ -228,7 +247,9 @@ Once you have created a webhook and registered events on it, notifications will 
 
 ## Contributing
 
-Use GitHub's standard fork/commit/pull-request cycle.  If you have any questions, email <support@semantics3.com>.
+Use GitHub's standard fork/commit/pull-request cycle.
+
+If you have any questions, email <support@semantics3.com>.
 
 ## Authors
 
@@ -237,7 +258,7 @@ Use GitHub's standard fork/commit/pull-request cycle.  If you have any questions
 
 ## Copyright
 
-Copyright (c) 2015 Semantics3 Inc.
+Copyright (c) 2017 Semantics3 Inc.
 
 ## License
 
