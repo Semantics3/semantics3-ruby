@@ -7,7 +7,7 @@ spec = Gem::Specification.new do |s|
   s.description = 'Get access to a constantly updated database of product and price data. See https://semantics3.com/ for more information.'
   s.authors = ['Sivamani Varun', 'Mounarajan P A', 'Vinoth Gopinathan']
   s.email = ['varun@semantics3.com']
-  s.homepage = 'https://semantics3.com'
+  s.homepage = 'https://www.semantics3.com'
   s.require_paths = %w{lib}
 
   s.add_dependency('json', '~> 1.8', '>= 1.8.1')
