@@ -24,7 +24,7 @@ module Semantics3
             raise Error.new('API Credentials Missing','You did not supply an api_key. Please sign up at https://semantics3.com/ to obtain your api_key.','api_key') if api_key == ''
             raise Error.new('API Credentials Missing','You did not supply an api_secret. Please sign up at https://semantics3.com/ to obtain your api_secret.','api_secret') if api_secret == ''
 
-            @consumer = OAuth::Consumer.new(@api_key, @api_secret)
+            @consumer = OAuth::Consumer.new(@api_key, @api_secret, :timeout => 60)
             @auth = OAuth::AccessToken.new(@consumer)
         end
 
