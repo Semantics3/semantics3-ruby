@@ -16,15 +16,16 @@ module Semantics3
     @auth={}
 
     class Base
-        def initialize(api_key,api_secret,auth = "oauth")
+        def initialize(api_key,api_secret,auth = "oauth",timeout = 60)
             @api_key = api_key
             @api_secret = api_secret
             @auth_method = auth
+            @timeout = timeout
 
             raise Error.new('API Credentials Missing','You did not supply an api_key. Please sign up at https://semantics3.com/ to obtain your api_key.','api_key') if api_key == ''
             raise Error.new('API Credentials Missing','You did not supply an api_secret. Please sign up at https://semantics3.com/ to obtain your api_secret.','api_secret') if api_secret == ''
 
-            @consumer = OAuth::Consumer.new(@api_key, @api_secret)
+            @consumer = OAuth::Consumer.new(@api_key, @api_secret, :timeout => @timeout)
             @auth = OAuth::AccessToken.new(@consumer)
         end
 
@@ -80,7 +81,7 @@ module Semantics3
 
     class Products < Base
 
-        def initialize api_key, api_secret, auth = 'oauth'
+        def initialize api_key, api_secret, auth = 'oauth', timeout = 60
             super
             clear() 
         end
